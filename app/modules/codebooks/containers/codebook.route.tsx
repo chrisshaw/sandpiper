@@ -9,6 +9,7 @@ import {
 } from "react-router";
 import { toast } from "sonner";
 import trackServerEvent from "~/modules/analytics/helpers/trackServerEvent.server";
+import { isAnnotationType } from "~/modules/annotations/helpers/annotationTypes";
 import requireAuth from "~/modules/authentication/helpers/requireAuth";
 import CodebookAuthorization from "~/modules/codebooks/authorization";
 import addDialog from "~/modules/dialogs/addDialog";
@@ -103,6 +104,13 @@ export async function action({ request }: Route.ActionArgs) {
         hasFlattenedCategories,
         flattenedAnnotationField,
       } = payload;
+
+      if (!isAnnotationType(annotationType)) {
+        return data(
+          { errors: { annotationType: "Invalid annotation type" } },
+          { status: 400 },
+        );
+      }
 
       if (!PromptAuthorization.canCreate(user, codebook.team as string)) {
         return data(

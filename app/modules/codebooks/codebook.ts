@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { getPaginationParams, getTotalPages } from "~/helpers/pagination";
 import codebookSchema from "~/lib/schemas/codebook.schema";
+import type { AnnotationTypeOptions } from "~/modules/annotations/helpers/annotationTypes";
 import type { FindOptions, PaginateProps } from "~/modules/common/types";
 import type { Codebook } from "./codebooks.types";
 import createPromptFromCodebook from "./services/createPromptFromCodebook.server";
@@ -90,7 +91,7 @@ export class CodebookService {
   static async createPromptFromCodebook(options: {
     codebookId: string;
     codebookVersionId: string;
-    annotationType: string;
+    annotationType: AnnotationTypeOptions;
     categoryIds?: string[];
     hasFlattenedCategories?: boolean;
     flattenedAnnotationField?: string;
