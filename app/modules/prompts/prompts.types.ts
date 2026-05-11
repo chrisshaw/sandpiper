@@ -1,3 +1,4 @@
+import type { AnnotationTypeOptions } from "~/modules/annotations/helpers/annotationTypes";
 import type { Team } from "../teams/teams.types";
 import type { User } from "../users/users.types";
 
@@ -6,7 +7,7 @@ export interface Prompt {
   name: string;
   team: Team | string;
   createdAt: string;
-  annotationType: string;
+  annotationType: AnnotationTypeOptions;
   productionVersion: number;
   createdBy: User | string;
   deletedAt?: Date;

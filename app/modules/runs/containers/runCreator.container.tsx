@@ -1,4 +1,8 @@
 import { useState } from "react";
+import {
+  isAnnotationType,
+  type AnnotationTypeOptions,
+} from "~/modules/annotations/helpers/annotationTypes";
 import useEstimateCost from "~/modules/billing/hooks/useEstimateCost";
 import { getDefaultModelCode } from "~/modules/llm/modelRegistry";
 import type { CreateRun, Run } from "~/modules/runs/runs.types";
@@ -23,9 +27,12 @@ export default function ProjectRunCreatorContainer({
   const [runName, setRunName] = useState(
     initialRun ? `${initialRun.name} (copy)` : "",
   );
-  const [selectedAnnotationType, setSelectedAnnotationType] = useState(
-    initialRun?.annotationType || "PER_UTTERANCE",
-  );
+  const [selectedAnnotationType, setSelectedAnnotationType] =
+    useState<AnnotationTypeOptions>(
+      isAnnotationType(initialRun?.annotationType ?? "")
+        ? (initialRun?.annotationType as AnnotationTypeOptions)
+        : "PER_UTTERANCE",
+    );
   const [selectedPrompt, setSelectedPrompt] = useState<string | null>(
     (initialRun?.prompt as string) || null,
   );
@@ -42,6 +49,7 @@ export default function ProjectRunCreatorContainer({
     initialRun?.shouldRunVerification ?? false,
   );
   const onSelectedAnnotationTypeChanged = (selectedAnnotationType: string) => {
+    if (!isAnnotationType(selectedAnnotationType)) return;
     setSelectedPrompt(null);
     setSelectedPromptVersion(null);
     setSelectedAnnotationType(selectedAnnotationType);

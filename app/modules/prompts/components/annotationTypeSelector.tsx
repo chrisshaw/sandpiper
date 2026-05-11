@@ -1,5 +1,6 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import map from "lodash/map";
+import type { AnnotationTypeOptions } from "~/modules/annotations/helpers/annotationTypes";
 import type { AnnotationType } from "../prompts.types";
 
 export default function AnnotationTypeSelector({
@@ -8,7 +9,7 @@ export default function AnnotationTypeSelector({
   onSelectedAnnotationTypeChanged,
 }: {
   annotationTypes: AnnotationType[];
-  annotationType: string;
+  annotationType: AnnotationTypeOptions;
   isAnnotationTypesOpen: boolean;
   onToggleAnnotationTypePopover: (isPromptsOpen: boolean) => void;
   onSelectedAnnotationTypeChanged: (selectedPrompt: string) => void;

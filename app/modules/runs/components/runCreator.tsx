@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Info } from "lucide-react";
 
+import type { AnnotationTypeOptions } from "~/modules/annotations/helpers/annotationTypes";
 import AnnotationTypeSelectorContainer from "~/modules/prompts/containers/annoationTypeSelectorContainer";
 import ModelSelectorContainer from "~/modules/prompts/containers/modelSelectorContainer";
 import PromptSelectorContainer from "~/modules/prompts/containers/promptSelectorContainer";
@@ -48,7 +49,7 @@ export default function RunCreator({
 }: {
   duplicateWarnings?: string[];
   runName: string;
-  selectedAnnotationType: string;
+  selectedAnnotationType: AnnotationTypeOptions;
   selectedPrompt: string | null;
   selectedPromptVersion: number | null;
   selectedModel: string;
