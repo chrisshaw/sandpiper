@@ -1,3 +1,4 @@
+import type { AnnotationTypeOptions } from "~/modules/annotations/helpers/annotationTypes";
 import handleLLMError from "~/modules/llm/helpers/handleLLMError";
 import LLM from "~/modules/llm/llm";
 import { PromptService } from "~/modules/prompts/prompt";
@@ -21,7 +22,7 @@ export default async function createPromptFromCodebook({
 }: {
   codebookId: string;
   codebookVersionId: string;
-  annotationType: string;
+  annotationType: AnnotationTypeOptions;
   categoryIds?: string[];
   hasFlattenedCategories?: boolean;
   flattenedAnnotationField?: string;

@@ -3,15 +3,17 @@ export const ANNOTATION_TYPES = {
   PER_SESSION: "Per session",
 } as const;
 
-export type AnnotationType = keyof typeof ANNOTATION_TYPES;
+export type AnnotationTypeOptions = keyof typeof ANNOTATION_TYPES;
 
-export const annotationTypeOptions: { value: AnnotationType; label: string }[] =
-  Object.entries(ANNOTATION_TYPES).map(([value, label]) => ({
-    value: value as AnnotationType,
-    label,
-  }));
+export const annotationTypeOptions: {
+  value: AnnotationTypeOptions;
+  label: string;
+}[] = Object.entries(ANNOTATION_TYPES).map(([value, label]) => ({
+  value: value as AnnotationTypeOptions,
+  label,
+}));
 
-export function isAnnotationType(v: string): v is AnnotationType {
+export function isAnnotationType(v: string): v is AnnotationTypeOptions {
   return v in ANNOTATION_TYPES;
 }
 

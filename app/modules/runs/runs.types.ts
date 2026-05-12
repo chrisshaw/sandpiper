@@ -1,3 +1,4 @@
+import type { AnnotationTypeOptions } from "~/modules/annotations/helpers/annotationTypes";
 import type { Project } from "~/modules/projects/projects.types";
 import type { Prompt } from "~/modules/prompts/prompts.types";
 import type { RunSnapshot } from "~/modules/runs/services/buildRunSnapshot.server";
@@ -46,7 +47,7 @@ export interface RunSession {
 
 export interface CreateRun {
   name: string;
-  selectedAnnotationType: string;
+  selectedAnnotationType: AnnotationTypeOptions;
   selectedPrompt: string | null;
   selectedPromptVersion: number | null;
   selectedModel: string;
