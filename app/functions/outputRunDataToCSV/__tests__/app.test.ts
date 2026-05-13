@@ -41,6 +41,9 @@ const makeRun = (overrides: Record<string, any> = {}) => ({
         { fieldKey: "rating" },
       ],
       version: 1,
+      systemPrompt: "ANNOTATION SYSTEM PROMPT",
+      verifySystemPrompt: "VERIFY SYSTEM PROMPT",
+      adjudicateSystemPrompt: "",
     },
     model: { code: "gpt-4", name: "GPT-4", provider: "openai" },
   },
@@ -296,6 +299,39 @@ describe("outputRunDataToCSV", () => {
         "Incorrect quality",
       );
     });
+  });
+
+  it("includes system prompts in the meta CSV", async () => {
+    const run = makeRun();
+
+    let callIndex = 0;
+    vi.mocked(fse.readJSON).mockImplementation(async () => {
+      const sessionId = run.sessions[callIndex].sessionId;
+      callIndex++;
+      return makeTranscript(sessionId);
+    });
+
+    await handler({
+      body: {
+        run: run as any,
+        teamId: "team1",
+        inputFolder: "storage/proj1/runs/run1",
+        outputFolder: "storage/proj1/runs/run1/exports",
+      },
+    });
+
+    const metaPath = Object.keys(capturedCsvFiles).find((p) =>
+      p.includes("meta.csv"),
+    );
+    expect(metaPath).toBeDefined();
+
+    const csv = capturedCsvFiles[metaPath!];
+    const [headerLine, valuesLine] = csv.split("\n");
+    expect(headerLine).toContain("promptSystemPrompt");
+    expect(headerLine).toContain("promptVerifySystemPrompt");
+    expect(headerLine).toContain("promptAdjudicateSystemPrompt");
+    expect(valuesLine).toContain("ANNOTATION SYSTEM PROMPT");
+    expect(valuesLine).toContain("VERIFY SYSTEM PROMPT");
   });
 
   it("always generates meta CSV", async () => {
