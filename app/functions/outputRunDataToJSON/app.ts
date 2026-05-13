@@ -62,6 +62,10 @@ export const handler = async (event: {
       promptName: run.snapshot?.prompt?.name ?? "",
       promptVersion: run.snapshot?.prompt?.version ?? run.promptVersion ?? "",
       promptUserPrompt: run.snapshot?.prompt?.userPrompt ?? "",
+      promptSystemPrompt: run.snapshot?.prompt?.systemPrompt ?? "",
+      promptVerifySystemPrompt: run.snapshot?.prompt?.verifySystemPrompt ?? "",
+      promptAdjudicateSystemPrompt:
+        run.snapshot?.prompt?.adjudicateSystemPrompt ?? "",
       promptAnnotationType: run.snapshot?.prompt?.annotationType ?? "",
       isHuman: run.isHuman ?? false,
       sessionsCount: run.sessions.length,
