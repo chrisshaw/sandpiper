@@ -19,6 +19,9 @@ vi.mock("~/modules/runs/services/buildRunSnapshot.server", () => ({
     }: {
       promptVersionNumber: number;
       modelCode: string;
+      annotationType: string;
+      shouldRunVerification: boolean;
+      isAdjudication: boolean;
     }) => ({
       prompt: {
         name: "Mock Prompt",
@@ -26,6 +29,9 @@ vi.mock("~/modules/runs/services/buildRunSnapshot.server", () => ({
         annotationSchema: [],
         annotationType: "PER_UTTERANCE",
         version: promptVersionNumber,
+        systemPrompt: "Mock annotation system prompt",
+        verifySystemPrompt: "",
+        adjudicateSystemPrompt: "",
       },
       model: { code: modelCode, provider: "openai", name: modelCode },
     }),
