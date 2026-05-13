@@ -35,6 +35,9 @@ const makeRun = (overrides: Record<string, any> = {}) => ({
       annotationType: "PER_UTTERANCE",
       annotationSchema: [],
       version: 1,
+      systemPrompt: "ANNOTATION SYSTEM PROMPT",
+      verifySystemPrompt: "VERIFY SYSTEM PROMPT",
+      adjudicateSystemPrompt: "",
     },
     model: { code: "gpt-4", name: "GPT-4", provider: "openai" },
   },
@@ -134,5 +137,35 @@ describe("outputRunDataToJSON", () => {
     expect(meta.runId).toBe("run1");
     expect(meta.runName).toBe("Test Run");
     expect(meta.promptName).toBe("Test Prompt");
+  });
+
+  it("includes system prompts in the meta JSONL", async () => {
+    const run = makeRun();
+
+    let callIndex = 0;
+    vi.mocked(fse.readJSON).mockImplementation(async () => {
+      const sessionId = run.sessions[callIndex].sessionId;
+      callIndex++;
+      return makeTranscript(sessionId);
+    });
+
+    await handler({
+      body: {
+        run: run as any,
+        teamId: "team1",
+        inputFolder: "storage/proj1/runs/run1",
+        outputFolder: "storage/proj1/runs/run1/exports",
+      },
+    });
+
+    const metaPath = Object.keys(capturedFiles).find((p) =>
+      p.includes("meta.jsonl"),
+    );
+    expect(metaPath).toBeDefined();
+
+    const meta = JSON.parse(capturedFiles[metaPath!]);
+    expect(meta.promptSystemPrompt).toBe("ANNOTATION SYSTEM PROMPT");
+    expect(meta.promptVerifySystemPrompt).toBe("VERIFY SYSTEM PROMPT");
+    expect(meta.promptAdjudicateSystemPrompt).toBe("");
   });
 });

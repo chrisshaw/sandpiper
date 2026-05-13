@@ -13,7 +13,7 @@ import addDialog from "~/modules/dialogs/addDialog";
 import PromptAuthorization from "../authorization";
 import PromptEditor from "../components/promptEditor";
 import { SYSTEM_FIELDS } from "../helpers/defaultPrompts";
-import getSystemPromptByAnnotationType from "../helpers/getSystemPromptByAnnotationType";
+import getSystemPrompt from "../helpers/getSystemPrompt.server";
 import tokenizePromptVersion from "../helpers/tokenizePromptVersion";
 import { PromptService } from "../prompt";
 import type { AnnotationSchemaItem } from "../prompts.types";
@@ -60,10 +60,13 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     }
   }
 
+  const systemPrompt = getSystemPrompt("annotation", prompt.annotationType);
+
   return {
     prompt: { data: prompt },
     promptVersion: { data: promptVersion },
     codebook: codebookData,
+    systemPrompt,
   };
 }
 
@@ -145,7 +148,7 @@ export default function PromptEditorRoute() {
   const submit = useSubmit();
   const [isSystemPromptVisible, setIsSystemPromptVisible] = useState(false);
 
-  const { prompt, promptVersion, codebook } = data;
+  const { prompt, promptVersion, codebook, systemPrompt } = data;
 
   const onSavePromptVersion = ({
     name,
@@ -207,10 +210,6 @@ export default function PromptEditorRoute() {
   const onToggleSystemPromptClicked = () => {
     setIsSystemPromptVisible(!isSystemPromptVisible);
   };
-
-  const systemPrompt = getSystemPromptByAnnotationType(
-    prompt.data.annotationType,
-  );
 
   return (
     <PromptEditor

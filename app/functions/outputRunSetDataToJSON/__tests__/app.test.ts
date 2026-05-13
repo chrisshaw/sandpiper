@@ -35,6 +35,9 @@ const makeRun = (index: number, overrides: Record<string, any> = {}) => ({
       userPrompt: "Annotate this",
       annotationType: "PER_SESSION",
       version: 1,
+      systemPrompt: "ANNOTATION SYSTEM PROMPT",
+      verifySystemPrompt: "",
+      adjudicateSystemPrompt: "",
     },
     model: { code: "gpt-4", name: "GPT-4", provider: "openai" },
   },
@@ -239,5 +242,38 @@ describe("outputRunSetDataToJSON", () => {
     const meta2 = JSON.parse(lines[1]);
     expect(meta1.runId).toBe("run1");
     expect(meta2.runId).toBe("run2");
+  });
+
+  it("includes system prompts in each meta JSONL row", async () => {
+    const runs = [makeRun(1), makeRun(2)];
+    const runSet = makeRunSet({ annotationType: "PER_SESSION" });
+
+    vi.mocked(fse.readJSON).mockImplementation(async () =>
+      makeTranscript("session-abc", { sessionAnnotations: true }),
+    );
+
+    await handler({
+      body: {
+        runSet: runSet as any,
+        runs: runs as any,
+        teamId: "team1",
+        inputFolder: "storage/proj1/runs",
+        outputFolder: "storage/proj1/run-sets/runset1/exports",
+      },
+    });
+
+    const metaPath = Object.keys(capturedFiles).find((p) =>
+      p.includes("meta.jsonl"),
+    );
+    expect(metaPath).toBeDefined();
+
+    const lines = capturedFiles[metaPath!].split("\n");
+    expect(lines).toHaveLength(2);
+    for (const line of lines) {
+      const meta = JSON.parse(line);
+      expect(meta.promptSystemPrompt).toBe("ANNOTATION SYSTEM PROMPT");
+      expect(meta.promptVerifySystemPrompt).toBe("");
+      expect(meta.promptAdjudicateSystemPrompt).toBe("");
+    }
   });
 });
