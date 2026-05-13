@@ -1,6 +1,6 @@
 import type { AnnotationTypeOptions } from "~/modules/annotations/helpers/annotationTypes";
 import { findModelByCode } from "~/modules/llm/modelRegistry";
-import getSystemPrompt from "~/modules/prompts/helpers/getSystemPrompt";
+import getSystemPrompt from "~/modules/prompts/helpers/getSystemPrompt.server";
 import { PromptService } from "~/modules/prompts/prompt";
 import type { AnnotationSchemaItem } from "~/modules/prompts/prompts.types";
 import { PromptVersionService } from "~/modules/prompts/promptVersion";

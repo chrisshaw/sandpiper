@@ -28,7 +28,7 @@ vi.mock("~/modules/llm/modelRegistry", () => ({
   })),
 }));
 
-vi.mock("~/modules/prompts/helpers/getSystemPrompt", () => ({
+vi.mock("~/modules/prompts/helpers/getSystemPrompt.server", () => ({
   default: vi.fn(
     (kind: string, annotationType: string) =>
       `SYSTEM PROMPT (${kind}, ${annotationType})`,

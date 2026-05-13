@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import getSystemPrompt from "../helpers/getSystemPrompt";
+import getSystemPrompt from "../helpers/getSystemPrompt.server";
 
 describe("getSystemPrompt", () => {
   it("returns the annotation per-utterance prompt", () => {
