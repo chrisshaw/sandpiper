@@ -211,7 +211,7 @@ describe("buildEvaluationReport", () => {
     expect(reports[0].pairwise[0].sampleSize).toBe(1);
   });
 
-  describe("shouldIncludeEmptyAnnotation config", () => {
+  describe("shouldIncludeUnannotatedSamples config", () => {
     it("includes empty annotations by default", async () => {
       const cache: SessionFileCache = {
         r1: {
@@ -237,11 +237,11 @@ describe("buildEvaluationReport", () => {
       expect(reports[0].pairwise[0].sampleSize).toBe(3);
     });
 
-    it("drops pairs where either side is empty when shouldIncludeEmptyAnnotation is false", async () => {
+    it("drops pairs where both sides are empty when shouldIncludeUnannotatedSamples is false", async () => {
       const cache: SessionFileCache = {
         r1: {
           s1: makeSession("good"),
-          s2: makeSession("good"),
+          s2: makeSession(null),
           s3: makeSession("bad"),
         },
         r2: {
@@ -258,7 +258,7 @@ describe("buildEvaluationReport", () => {
         runs,
         cache,
         ["s1", "s2", "s3"],
-        { shouldIncludeEmptyAnnotation: false },
+        { shouldIncludeUnannotatedSamples: false },
       );
 
       expect(reports[0].pairwise[0].sampleSize).toBe(2);
@@ -267,7 +267,7 @@ describe("buildEvaluationReport", () => {
 
     it("yields sampleSize 0 and meanKappa 0 when filtering leaves no pairs", async () => {
       const cache: SessionFileCache = {
-        r1: { s1: makeSession("good") },
+        r1: { s1: makeSession(null) },
         r2: { s1: makeSession(null) },
       };
       const runs = [makeRun("r1", "R1"), makeRun("r2", "R2")];
@@ -278,7 +278,7 @@ describe("buildEvaluationReport", () => {
         runs,
         cache,
         ["s1"],
-        { shouldIncludeEmptyAnnotation: false },
+        { shouldIncludeUnannotatedSamples: false },
       );
 
       expect(reports[0].pairwise[0].sampleSize).toBe(0);
@@ -289,7 +289,7 @@ describe("buildEvaluationReport", () => {
       const cache: SessionFileCache = {
         base: {
           s1: makeSession("good"),
-          s2: makeSession("good"),
+          s2: makeSession(null),
           s3: makeSession("bad"),
         },
         r2: {
@@ -306,7 +306,7 @@ describe("buildEvaluationReport", () => {
         runs,
         cache,
         ["s1", "s2", "s3"],
-        { shouldIncludeEmptyAnnotation: false },
+        { shouldIncludeUnannotatedSamples: false },
       );
 
       expect(reports[0].pairwise[0].sampleSize).toBe(2);

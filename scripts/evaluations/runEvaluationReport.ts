@@ -21,27 +21,27 @@ async function main() {
     ? path.resolve(process.argv[2])
     : path.join(__dirname, "sampleEvaluation.json");
 
-  const shouldIncludeEmptyAnnotationArg = process.argv[3];
+  const shouldIncludeUnannotatedSamplesArg = process.argv[3];
 
   if (
-    shouldIncludeEmptyAnnotationArg !== undefined &&
-    shouldIncludeEmptyAnnotationArg !== "true" &&
-    shouldIncludeEmptyAnnotationArg !== "false"
+    shouldIncludeUnannotatedSamplesArg !== undefined &&
+    shouldIncludeUnannotatedSamplesArg !== "true" &&
+    shouldIncludeUnannotatedSamplesArg !== "false"
   ) {
     console.error(
-      `[error] shouldIncludeEmptyAnnotation must be "true" or "false" (got "${shouldIncludeEmptyAnnotationArg}")`,
+      `[error] shouldIncludeUnannotatedSamples must be "true" or "false" (got "${shouldIncludeUnannotatedSamplesArg}")`,
     );
     process.exit(1);
   }
 
-  const shouldIncludeEmptyAnnotation =
-    shouldIncludeEmptyAnnotationArg === undefined
+  const shouldIncludeUnannotatedSamples =
+    shouldIncludeUnannotatedSamplesArg === undefined
       ? true
-      : shouldIncludeEmptyAnnotationArg === "true";
+      : shouldIncludeUnannotatedSamplesArg === "true";
 
   console.log(`[input] Loading fixture: ${fixturePath}`);
   console.log(
-    `[input] shouldIncludeEmptyAnnotation: ${shouldIncludeEmptyAnnotation}`,
+    `[input] shouldIncludeUnannotatedSamples: ${shouldIncludeUnannotatedSamples}`,
   );
   const fixture = JSON.parse(fs.readFileSync(fixturePath, "utf8")) as Fixture;
 
@@ -81,7 +81,7 @@ async function main() {
     fixture.runs,
     fixture.cache,
     fixture.commonSessionIds,
-    { shouldIncludeEmptyAnnotation },
+    { shouldIncludeUnannotatedSamples },
   );
 
   console.log("\n[output] Report:");

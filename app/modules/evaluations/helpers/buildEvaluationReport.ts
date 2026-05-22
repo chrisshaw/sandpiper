@@ -21,11 +21,11 @@ export interface SessionFileCache {
 }
 
 export interface BuildEvaluationReportConfig {
-  shouldIncludeEmptyAnnotation: boolean;
+  shouldIncludeUnannotatedSamples: boolean;
 }
 
 const DEFAULT_CONFIG: BuildEvaluationReportConfig = {
-  shouldIncludeEmptyAnnotation: false,
+  shouldIncludeUnannotatedSamples: true,
 };
 
 async function downloadSessionFile(
@@ -185,7 +185,7 @@ export default async function buildEvaluationReport(
 
       let pairedA = alignedA;
       let pairedB = alignedB;
-      if (!config.shouldIncludeEmptyAnnotation) {
+      if (!config.shouldIncludeUnannotatedSamples) {
         pairedA = [];
         pairedB = [];
         for (let i = 0; i < alignedA.length; i++) {

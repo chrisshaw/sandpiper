@@ -112,13 +112,13 @@ Loads a fixture JSON file and runs [`buildEvaluationReport`](../../app/modules/e
 ### Usage
 
 ```bash
-yarn tsx scripts/evaluations/runEvaluationReport.ts [fixturePath] [shouldIncludeEmptyAnnotation]
+yarn tsx scripts/evaluations/runEvaluationReport.ts [fixturePath] [shouldIncludeUnannotatedSamples]
 ```
 
-| Arg                              | Required | Description                                                                                                                                                                                                                       |
-| -------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `[fixturePath]`                  | No       | Path to a fixture JSON. Defaults to `sampleEvaluation.json`.                                                                                                                                                                      |
-| `[shouldIncludeEmptyAnnotation]` | No       | `true` or `false`. When `false`, utterance pairs where neither annotator labeled the field are excluded from the sample. Defaults to `true` (matches the pre-`shouldIncludeEmptyAnnotation` behavior of `buildEvaluationReport`). |
+| Arg                                 | Required | Description                                                                                                                                                                                                                          |
+| ----------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `[fixturePath]`                     | No       | Path to a fixture JSON. Defaults to `sampleEvaluation.json`.                                                                                                                                                                         |
+| `[shouldIncludeUnannotatedSamples]` | No       | `true` or `false`. When `false`, utterance pairs where neither annotator labeled the field are excluded from the sample. Defaults to `true` (matches the pre-`shouldIncludeUnannotatedSamples` behavior of `buildEvaluationReport`). |
 
 ### Output
 
@@ -153,7 +153,7 @@ Example output:
 
 ### Config
 
-`shouldIncludeEmptyAnnotation` controls whether utterance pairs where neither annotator labeled the field count toward the sample. Default is `true` (include empty pairs) — this matches the behavior of `buildEvaluationReport` before the `shouldIncludeEmptyAnnotation` option was introduced. Pass `false` as the 2nd arg to exclude them:
+`shouldIncludeUnannotatedSamples` controls whether utterance pairs where neither annotator labeled the field count toward the sample. Default is `true` (include empty pairs) — this matches the behavior of `buildEvaluationReport` before the `shouldIncludeUnannotatedSamples` option was introduced. Pass `false` as the 2nd arg to exclude them:
 
 ```bash
 yarn tsx scripts/evaluations/runEvaluationReport.ts scripts/evaluations/myEvaluation.json false
