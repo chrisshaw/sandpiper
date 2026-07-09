@@ -4,7 +4,9 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    exclude: ["**/node_modules/**", "**/dist/**", "e2e/**"],
+    // .claude/worktrees holds full repo copies; without this every test runs
+    // twice against the same test database.
+    exclude: ["**/node_modules/**", "**/dist/**", "e2e/**", "**/.claude/**"],
     globalSetup: "./test/vitest.globalSetup.ts",
     setupFiles: ["./test/vitest.dbSetup.ts"],
     coverage: {
