@@ -1,0 +1,26 @@
+{
+  "region": "us-east-2",
+  "models": {
+    "anthropic.claude-4.5-haiku": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "anthropic.claude-4.5-sonnet": "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+    "anthropic.claude-4.5-opus": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "anthropic.claude-4.6-sonnet": "us.anthropic.claude-sonnet-4-6",
+    "anthropic.claude-4.6-opus": "us.anthropic.claude-opus-4-6-v1",
+    "anthropic.claude-4.7-opus": "us.anthropic.claude-opus-4-7",
+    "claude-opus-4-8": "us.anthropic.claude-opus-4-8",
+
+    "openai.gpt-5-mini": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "openai.gpt-5.4-nano": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "openai.gpt-5.4-mini": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "openai.gpt-5.1": "us.anthropic.claude-sonnet-4-6",
+    "openai.gpt-5.2": "us.anthropic.claude-sonnet-4-6",
+    "openai.gpt-5.4": "us.anthropic.claude-sonnet-4-6",
+    "openai.gpt-5.5": "us.anthropic.claude-sonnet-4-6",
+
+    "nto.google.gemini-2.5-flash-lite": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "nto.google.gemini-3.1-flash-lite-preview": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "nto.google.gemini-3-flash-preview": "us.anthropic.claude-sonnet-4-6",
+    "nto.google.gemini-3.1-pro-preview": "us.anthropic.claude-sonnet-4-6",
+    "nto.google.gemini-3.5-flash": "us.anthropic.claude-sonnet-4-6"
+  }
+}

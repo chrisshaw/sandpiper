@@ -65,6 +65,26 @@ SUPER_ADMIN_GITHUB_ID='1'
 
 `SUPER_ADMIN_GITHUB_ID` must be an integer even locally: the server parses it on boot to seed a super admin, and a blank value crashes startup. Any integer is fine when you are not using real GitHub OAuth. Annotation runs need a real `LLM_PROVIDER` key, but browsing and creating projects do not.
 
+#### LLM providers
+
+`LLM_PROVIDER` selects a provider from `app/modules/llm/providers`:
+
+- **`AI_GATEWAY`** — an OpenAI-compatible gateway (LiteLLM in production). Set `AI_GATEWAY_BASE_URL` + `AI_GATEWAY_KEY`.
+- **`BEDROCK`** — talks to **AWS Bedrock directly, no gateway or sidecar**. The model codes in `app/config/ai_gateway.json` are mapped to Bedrock inference profiles in `app/config/bedrock_models.json`. Auth, in order of precedence:
+  1. `BEDROCK_API_KEY` — a Bedrock API key (bearer token), the simplest per-user option;
+  2. `AWS_KEY` + `AWS_SECRET` — IAM access keys (same vars as the S3 adapter);
+  3. nothing set — the default AWS credential chain (`~/.aws`, IAM role).
+
+  Set `AWS_REGION` (defaults to the region in `bedrock_models.json`). Example local config:
+
+  ```bash
+  LLM_PROVIDER='BEDROCK'
+  AWS_REGION='us-east-2'
+  BEDROCK_API_KEY='...'        # or AWS_KEY/AWS_SECRET, or rely on ~/.aws
+  ```
+
+  Spend reporting works the same as any provider: cost is computed from token usage × `ai_gateway.json` pricing and written to the billing ledger — no LiteLLM required.
+
 ### Database
 
 The app uses MongoDB transactions, which require a replica set, so a standalone `mongod` will fail. Run a single-node replica set in Docker:
