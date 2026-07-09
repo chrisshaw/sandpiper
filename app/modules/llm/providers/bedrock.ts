@@ -23,6 +23,13 @@ const bedrockConfig = bedrockConfigRaw as BedrockConfig;
 const DEFAULT_MAX_TOKENS = 8192;
 const STRUCTURED_TOOL_NAME = "structured_output";
 
+// The gateway provider sends `response_format: { type: "json_object" }` when no
+// schema is given, so callers may rely on a JSON reply while their prompt asks
+// for a plain-text shape (e.g. leadRole.prompt.json). Converse has no
+// response_format, so state the constraint in the system prompt instead.
+const JSON_OBJECT_INSTRUCTION =
+  "Reply with a single valid JSON object and nothing else. Do not wrap it in code fences or add any prose.";
+
 // Map an ai_gateway.json model code (e.g. "anthropic.claude-4.5-sonnet") to a
 // Bedrock model / inference-profile id. Base model ids require an inference
 // profile, so these are the `us.` profile ids.
@@ -145,6 +152,10 @@ registerLLM("BEDROCK", {
     const { system, conversation } = toBedrockMessages(messages);
     const schemaObject =
       typeof schema === "string" ? (JSON.parse(schema) as object) : schema;
+
+    if (!schemaObject) {
+      system.push({ text: JSON_OBJECT_INSTRUCTION });
+    }
 
     const response = await llm.send(
       new ConverseCommand({
