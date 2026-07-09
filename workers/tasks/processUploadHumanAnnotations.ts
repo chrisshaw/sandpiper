@@ -3,6 +3,7 @@ import { parse } from "csv-parse/sync";
 import fse from "fs-extra";
 import filter from "lodash/filter";
 import find from "lodash/find.js";
+import buildAnnotationsForSession from "../../app/modules/humanAnnotations/helpers/buildAnnotationsForSession";
 import buildAnnotationsForUtterance from "../../app/modules/humanAnnotations/helpers/buildAnnotationsForUtterance";
 import { RunService } from "../../app/modules/runs/run";
 import getStorageAdapter from "../../app/modules/storage/helpers/getStorageAdapter";
@@ -24,6 +25,13 @@ export default async function processUploadHumanAnnotations(job: Job) {
   const run = await RunService.findById(runId);
   if (run?.stoppedAt) {
     return { status: "STOPPED" };
+  }
+
+  const annotationType =
+    run?.snapshot?.prompt?.annotationType || "PER_UTTERANCE";
+  const fieldTypes: Record<string, string> = {};
+  for (const item of run?.snapshot?.prompt?.annotationSchema ?? []) {
+    if (item.fieldType) fieldTypes[item.fieldKey] = item.fieldType;
   }
 
   try {
@@ -60,25 +68,42 @@ export default async function processUploadHumanAnnotations(job: Job) {
     const fileData = await fse.readFile(downloadedPath);
     const originalJSON = JSON.parse(fileData.toString());
 
-    for (const row of sessionRows) {
-      const utterance = find(
-        originalJSON.transcript,
-        (u: Record<string, unknown>) =>
-          String(u.sequence_id) === String(row.sequence_id),
-      );
-      if (!utterance) continue;
+    if (annotationType === "PER_SESSION") {
+      for (const row of sessionRows) {
+        const annotations = buildAnnotationsForSession(
+          row,
+          annotator,
+          headers,
+          fieldTypes,
+        );
 
-      const annotations = buildAnnotationsForUtterance(
-        row,
-        utterance._id,
-        annotator,
-        headers,
-      );
+        originalJSON.annotations = [
+          ...(originalJSON.annotations || []),
+          ...annotations,
+        ];
+      }
+    } else {
+      for (const row of sessionRows) {
+        const utterance = find(
+          originalJSON.transcript,
+          (u: Record<string, unknown>) =>
+            String(u.sequence_id) === String(row.sequence_id),
+        );
+        if (!utterance) continue;
 
-      utterance.annotations = [
-        ...(utterance.annotations || []),
-        ...annotations,
-      ];
+        const annotations = buildAnnotationsForUtterance(
+          row,
+          utterance._id,
+          annotator,
+          headers,
+          fieldTypes,
+        );
+
+        utterance.annotations = [
+          ...(utterance.annotations || []),
+          ...annotations,
+        ];
+      }
     }
 
     const inputFileSplit = inputFile.split("/");

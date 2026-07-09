@@ -74,6 +74,21 @@ describe("buildAnnotationTemplateColumns", () => {
     ]);
   });
 
+  it("uses session-level context columns for PER_SESSION", () => {
+    const columns = buildAnnotationTemplateColumns(
+      {
+        annotators: ["joe"],
+        fields: [{ fieldKey: "ON_TASK", slots: 1 }],
+      },
+      "PER_SESSION",
+    );
+    expect(columns).toEqual([
+      "session_id",
+      "content",
+      "annotator[joe][0]ON_TASK",
+    ]);
+  });
+
   it("generates columns parseable by parseAnnotationColumn", () => {
     const columns = buildAnnotationTemplateColumns({
       annotators: ["joe", "josephine"],

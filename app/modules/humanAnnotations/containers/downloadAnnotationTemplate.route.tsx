@@ -57,8 +57,15 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     });
   }
 
-  const columns = buildAnnotationTemplateColumns(config);
-  const rows = buildAnnotationTemplateRows(sessionTranscripts, columns);
+  const annotationType = runSet.annotationType as
+    | "PER_UTTERANCE"
+    | "PER_SESSION";
+  const columns = buildAnnotationTemplateColumns(config, annotationType);
+  const rows = buildAnnotationTemplateRows(
+    sessionTranscripts,
+    columns,
+    annotationType,
+  );
 
   const csv = json2csv(rows, {
     keys: columns,

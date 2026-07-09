@@ -87,6 +87,23 @@ describe("buildAnnotationsForUtterance", () => {
     expect(result).toEqual([]);
   });
 
+  it("coerces values to the declared field type", () => {
+    const row = {
+      "annotator[joe][0]PRAISE": "TRUE",
+      "annotator[joe][0]score": "3",
+    };
+    const headers = ["annotator[joe][0]PRAISE", "annotator[joe][0]score"];
+
+    const result = buildAnnotationsForUtterance(row, "utt-1", "joe", headers, {
+      PRAISE: "boolean",
+      score: "number",
+    });
+
+    expect(result).toEqual([
+      { _id: "utt-1", identifiedBy: "HUMAN", PRAISE: true, score: 3 },
+    ]);
+  });
+
   it("only includes annotations for the specified annotator", () => {
     const row = {
       "annotator[joe][0]field": "A",

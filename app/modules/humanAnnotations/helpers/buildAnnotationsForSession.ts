@@ -6,9 +6,11 @@ interface AnnotationObject {
   [key: string]: unknown;
 }
 
-export default function buildAnnotationsForUtterance(
+// Session-level counterpart to buildAnnotationsForUtterance. Produces annotation
+// objects stored on the session root (mirroring AI per-session output), so the
+// `_id` is the slot index rather than an utterance id.
+export default function buildAnnotationsForSession(
   row: Record<string, string>,
-  utteranceId: string,
   annotator: string,
   headers: string[],
   fieldTypes: Record<string, string> = {},
@@ -23,7 +25,7 @@ export default function buildAnnotationsForUtterance(
     if (Object.keys(fields).length === 0) continue;
 
     annotations.push({
-      _id: utteranceId,
+      _id: String(index),
       identifiedBy: "HUMAN",
       ...fields,
     });

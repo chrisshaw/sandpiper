@@ -17,6 +17,8 @@ Sandpiper uses a set of standard inter-rater agreement and classification metric
 2.  **Open the Evaluation Tab:** Navigate to the run set and click the "Evaluation" tab.
 3.  **View Metrics:** Sandpiper automatically calculates Cohen's Kappa, Precision, Recall, and F1 for all run pairs. If **Human Annotations** are included, they serve as the gold standard for accuracy metrics.
 
+> **Values are compared as exact strings.** Every annotation value is stringified and matched with strict equality: `"PRAISE"` matches `"PRAISE"` but not `"praise"`, and a boolean `true` matches another `true` but not the text `"TRUE"`. This is why human labels must use the same codes and the same types as the LLM runs — see **[Human Annotations](humanAnnotations)** on boolean and typed fields. Human runs coded before typed import was added may show artificially low agreement until they are re-uploaded.
+
 ## Metrics
 
 ### 1. Cohen's Kappa (κ)
