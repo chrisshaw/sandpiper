@@ -4,8 +4,10 @@ import requireAuth from "~/modules/authentication/helpers/requireAuth";
 import ProjectAuthorization from "~/modules/projects/authorization";
 import { ProjectService } from "~/modules/projects/project";
 import { RunSetService } from "~/modules/runSets/runSet";
+import { RunService } from "~/modules/runs/run";
 import getStorageAdapter from "~/modules/storage/helpers/getStorageAdapter";
 import buildAnnotationSchemaFromHeaders from "../helpers/buildAnnotationSchemaFromHeaders";
+import getAnnotationFieldsFromRuns from "../helpers/getAnnotationFieldsFromRuns";
 import analyzeHumanCsv from "../services/analyzeHumanCsv.server";
 import createHumanRun from "../services/createHumanRun.server";
 import uploadHumanAnnotations from "../services/uploadHumanAnnotations.server";
@@ -90,7 +92,21 @@ export async function action({ request, params }: Route.ActionArgs) {
         uploadPath: csvPath,
       });
 
-      const annotationSchema = buildAnnotationSchemaFromHeaders(headers);
+      // Recover each field's type from the run set's existing runs so imported
+      // values can be coerced (e.g. "TRUE" -> boolean true) and the human run's
+      // schema records the type. Falls back to string when no typed run exists.
+      const runSetRuns = await RunService.find({
+        match: { _id: { $in: runSet.runs ?? [] } },
+      });
+      const fieldTypeMap: Record<string, string> = {};
+      for (const field of getAnnotationFieldsFromRuns(runSetRuns)) {
+        if (field.fieldType) fieldTypeMap[field.fieldKey] = field.fieldType;
+      }
+
+      const annotationSchema = buildAnnotationSchemaFromHeaders(
+        headers,
+        fieldTypeMap,
+      );
 
       const matchedSessionIds = analysis.matchedSessions.map((s) => s._id);
       const runIds: string[] = [];
