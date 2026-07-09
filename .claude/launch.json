@@ -1,0 +1,30 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "app",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["app:dev"],
+      "port": 5173,
+      "autoPort": false
+    },
+    {
+      "name": "workers",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["workers:dev"]
+    },
+    {
+      "name": "redis",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["local:redis"],
+      "port": 6379
+    },
+    {
+      "name": "full-stack",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["local:start"],
+      "port": 5173,
+      "autoPort": false
+    }
+  ]
+}
