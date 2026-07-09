@@ -19,7 +19,7 @@ When you upload a CSV of human annotations, Sandpiper validates the data, matche
 
 1.  **Open a Run Set:** Navigate to the **Run Set** where you want to add human labels.
 2.  **Download Template:** From the Run Set dropdown menu, click **"Download Annotation Template"**. You can configure how many annotator slots to include per field before generating the CSV (see the definition of a **slot** below).
-3.  **Review the Template:** The generated CSV includes these columns:
+3.  **Review the Template:** The template's shape follows the run set's **[Annotation Type](annotationType)**. For a **[per-utterance](perUtterance)** run set, the CSV has **one row per utterance** with these columns (for **[per-session](perSession)** run sets, see [Per-session human runs](#per-session-human-runs) below):
     - `session_id` — the session identifier
     - `sequence_id` — the position of the utterance within the session
     - `role` — the speaker role (e.g. Tutor, Student)
@@ -45,11 +45,36 @@ A template for annotator `joe` coding one field, `TUTOR_MOVE`, with **2 slots** 
 - Here `joe` gives one utterance two codes (`PROBING_UNDERSTAND` + `GIVING_HINT`) using slots `0` and `1`; every other row uses only slot `0`.
 - Adding a second annotator (`josephine`) would add a parallel set of columns: `annotator[josephine][0]TUTOR_MOVE`, etc. — and create a second Human Run.
 
+### Per-session human runs
+
+When the run set's annotation type is **[Per session](perSession)**, coding happens at the level of the whole session, not each utterance. The template reflects this: it has **one row per session** and only two context columns.
+
+| Column       | Meaning                                                                                                                       |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| `session_id` | the session identifier                                                                                                        |
+| `content`    | the full transcript of that session (each line `role: content`), included read-only so you can code without leaving the sheet |
+
+The `annotator[<name>][<slot>]<fieldKey>` columns work exactly as they do per-utterance. Enter one value per session in slot `0`; use extra slots only when a session can carry more than one value for a field.
+
+On upload, these are stored as **session-level annotations** — the same shape an LLM per-session run produces — so a per-session human run lines up correctly against LLM runs in an evaluation. (A per-session template has no `sequence_id` or per-utterance `role`/`content` columns.)
+
 ### Annotating the CSV
 
 1.  **Fill in Labels:** Open the CSV in a spreadsheet editor and fill in the annotator columns with your human labels.
 2.  **Multiple Annotators:** Each unique annotator name in the column headers becomes its own human run. Sandpiper detects annotators automatically from the `annotator[<name>][<slot>]<field>` format.
 3.  **Match Schema Codes:** Each column's `<fieldKey>` corresponds to a field in your **[Prompt Schema](schema)**, and the values you enter should match that field's codes (e.g., `PRAISE`, `NOT_PRAISE`). Sandpiper accepts any string value, but codes that don't match the schema won't align with LLM runs during evaluation.
+
+### Boolean and typed fields
+
+Schema fields have a **type** — string, number, or boolean (see **[Schema](schema)**). Code each value to match its field's type so it imports as a real value rather than plain text:
+
+- **Boolean fields:** enter `TRUE` or `FALSE`. Case does not matter, and `true`/`false`, `1`/`0`, and `yes`/`no` are also accepted — so a spreadsheet checkbox that exports as `TRUE`/`FALSE` works as-is. On import these become real booleans, so they display as a **checkbox** (just like LLM boolean annotations) and compare correctly against LLM values in an evaluation.
+- **Number fields:** enter a plain number such as `4`; it imports as a number.
+- **String / coded fields:** enter the schema code, e.g. `PRAISE`.
+
+Sandpiper reads each field's type from the LLM runs already in the run set (the same runs whose fields the template offers). If a field has no typed LLM run to learn from, its values are kept as text.
+
+> **Coded a run before this was supported?** Human runs uploaded before typed import was added stored booleans as the literal text `"TRUE"`/`"FALSE"`, which do **not** match LLM booleans and make agreement scores in their evaluations untrustworthy. Existing runs are **not** converted automatically — re-download the template and re-upload those runs to fix their metrics.
 
 ### Uploading the CSV
 

@@ -37,4 +37,5 @@ You configure the schema as part of your **Prompt** creation process.
 - **[Prompts](prompts)** — Where the schema is defined and used
 - **[Codebooks](codebooks)** — Classification schemes that inform schema fields
 - **[Annotations](annotations)** — The structured output that follows the schema
+- **[Human Annotations](humanAnnotations)** — How field types (including boolean) are entered when coding by hand
 - **[Runs](runs)** — Where the schema is applied to produce annotations
