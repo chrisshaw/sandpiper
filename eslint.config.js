@@ -6,7 +6,15 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default defineConfig([
-  globalIgnores(["**/dist", "**/node_modules", "**/build", "**/.react-router"]),
+  globalIgnores([
+    "**/dist",
+    "**/node_modules",
+    "**/build",
+    "**/.react-router",
+    // Full repo copies; linting them duplicates every file and trips
+    // typescript-eslint on the second tsconfig.json.
+    "**/.claude",
+  ]),
   {
     files: ["**/*.{ts,tsx}"],
     extends: [js.configs.recommended, tseslint.configs.recommended],
