@@ -1,6 +1,6 @@
 # Running Sandpiper locally
 
-This fork tracks [National-Tutoring-Observatory/sandpiper](https://github.com/National-Tutoring-Observatory/sandpiper) and pulls from it regularly. To keep merges clean, **everything local-specific lives in this file and in `localMode/`** — upstream's source, `README.md`, and `package.json` are left untouched.
+This fork tracks [National-Tutoring-Observatory/sandpiper](https://github.com/National-Tutoring-Observatory/sandpiper) and pulls from it regularly. To keep merges clean, **everything local-specific lives in this file, in `.env.local.example`, and in `localMode/`** — upstream's source, `README.md`, `.env.example`, and `package.json` are left untouched.
 
 There is exactly one supported way to run locally. It is deliberately opinionated: no alternatives, no branching paths, nothing to choose.
 
@@ -12,8 +12,8 @@ Three one-time steps, then one command forever after.
 # 1. install
 yarn
 
-# 2. env — copy the example and fill in the local values (see Environment, below)
-cp .env.example .env
+# 2. env — copy the local example, then fill in SESSION_SECRET and PROJECT_ROOT
+cp .env.local.example .env
 
 # 3. database — a single-node Mongo replica set with the app's root user.
 #    The app uses transactions, which a standalone mongod cannot serve.
@@ -54,24 +54,15 @@ You still see spend. `BILLING_ENABLED` stays unset, which hides the Stripe top-u
 
 ## Environment
 
-For a fully local setup (no AWS, no GitHub OAuth), the values that matter are:
+[`.env.local.example`](.env.local.example) is a complete, working local config — copy it to `.env` and fill in the two values it asks for. Upstream's `.env.example` documents the _hosted_ deployment; you do not need it.
 
 ```bash
-STORAGE_ADAPTER='LOCAL'
-DOCUMENTS_ADAPTER='LOCAL'
-DOCUMENT_DB_LOCAL='true'
-DOCUMENT_DB_CONNECTION_STRING='localhost:27017/sandpiper?authSource=admin&directConnection=true'
-DOCUMENT_DB_USERNAME='root'
-DOCUMENT_DB_PASSWORD='example'
-SESSION_SECRET='<openssl rand -hex 64>'
-PROJECT_ROOT='<absolute path to this repo>'
-REDIS_LOCAL='true'
-LLM_PROVIDER='BEDROCK'
-AUTH_CALLBACK_URL='http://localhost:5173/auth/callback'
-SUPER_ADMIN_GITHUB_ID='1'
+cp .env.local.example .env
 ```
 
-`SUPER_ADMIN_GITHUB_ID` must be an integer even locally: the server parses it on boot to seed a super admin, and a blank value crashes startup. Any integer is fine when you are not using real GitHub OAuth. Annotation runs need a real `LLM_PROVIDER` key, but browsing and creating projects do not.
+Only two values need filling: `SESSION_SECRET` (`openssl rand -hex 64`) and `PROJECT_ROOT` (the absolute path to this repo). No AWS keys, no GitHub OAuth app.
+
+Two gotchas the file also calls out. `SUPER_ADMIN_GITHUB_ID` must parse as an integer even locally, because the server reads it on boot to seed a super admin and a blank value crashes startup — any integer is fine when you are not using real GitHub OAuth. And annotation runs need working Bedrock credentials, though browsing and creating projects do not.
 
 Leave `BILLING_ENABLED` unset. See [Billing](#billing).
 
