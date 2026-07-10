@@ -1,23 +1,21 @@
 import { redirect } from "react-router";
+import { Strategy } from "remix-auth/strategy";
+import setupNewUser from "~/modules/authentication/services/setupNewUser.server";
 import { FeatureFlagService } from "~/modules/featureFlags/featureFlag";
 import { UserService } from "~/modules/users/user";
-import sessionStorage from "../../../../sessionStorage";
-import setupNewUser from "../services/setupNewUser.server";
-import type { Route } from "./+types/devLogin.route";
+import type { User } from "~/modules/users/users.types";
 
 // Local-only login bypass. Production uses GitHub OAuth (see githubStrategy);
-// this route lets you sign in without an OAuth app while developing.
+// this strategy is registered OVER the "github" name (see ./index.ts) so the
+// signup page's own "sign up with GitHub" button signs you in without an OAuth
+// app while developing.
 const DEV_EMAIL = "dev@localhost";
 
 // Flags gated in the UI. Every dev login also picks up any flags created in
 // the DB, so the local super admin always sees every gated feature.
 const KNOWN_FLAGS = ["HAS_ADJUDICATION", "HAS_CODEBOOKS", "HAS_PROMPT_LIBRARY"];
 
-export async function loader({ request }: Route.LoaderArgs) {
-  if (process.env.NODE_ENV === "production") {
-    throw redirect("/");
-  }
-
+async function findOrCreateDevUser(): Promise<User> {
   let user = await UserService.findOne({ email: DEV_EMAIL });
 
   if (!user) {
@@ -42,12 +40,29 @@ export async function loader({ request }: Route.LoaderArgs) {
   const allFlags = [...new Set([...KNOWN_FLAGS, ...dbFlags])];
   user = (await UserService.updateById(user._id, { featureFlags: allFlags }))!;
 
-  const session = await sessionStorage.getSession(
-    request.headers.get("cookie"),
-  );
-  session.set("user", user);
+  return user;
+}
 
-  return redirect("/", {
-    headers: { "Set-Cookie": await sessionStorage.commitSession(session) },
-  });
+export default class LocalDevStrategy extends Strategy<User, never> {
+  name = "local-dev";
+
+  constructor() {
+    super(async () => {
+      throw new Error("LocalDevStrategy has no verify step");
+    });
+  }
+
+  async authenticate(request: Request): Promise<User> {
+    const url = new URL(request.url);
+
+    // First leg: the signup page POSTs to the authentication action, where a
+    // real strategy would redirect to the provider. Skip the provider and go
+    // straight to upstream's callback route, which calls authenticate again,
+    // commits the session, and honors returnTo/onboarding.
+    if (!url.pathname.startsWith("/auth/callback")) {
+      throw redirect("/auth/callback/github");
+    }
+
+    return findOrCreateDevUser();
+  }
 }
