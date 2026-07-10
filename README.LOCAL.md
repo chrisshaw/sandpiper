@@ -22,8 +22,11 @@ sleep 5 && docker exec sandpiper-mongo mongosh --quiet --eval '
   rs.initiate({ _id: "rs0", members: [{ _id: 0, host: "localhost:27017" }] });
   sleep(2000);
   db.getSiblingDB("admin").createUser({ user: "root", pwd: "example", roles: [{ role: "root", db: "admin" }] });
+  db.getSiblingDB("admin").createUser({ user: "ci_user", pwd: "ci_password", roles: [{ role: "readWriteAnyDatabase", db: "admin" }, { role: "dbAdminAnyDatabase", db: "admin" }] });
 '
 ```
+
+The second user is what `yarn test` authenticates as (`.env.ci`); without it every test file fails at connect with `Authentication failed`.
 
 Then, every time:
 
@@ -86,6 +89,16 @@ Leave `BILLING_ENABLED` unset. See [Billing](#billing).
 - **`AI_GATEWAY`** — an OpenAI-compatible gateway (LiteLLM in production). Set `AI_GATEWAY_BASE_URL` + `AI_GATEWAY_KEY`.
 
 Spend reporting works the same for either: cost is computed from token usage × `ai_gateway.json` pricing and written to the billing ledger.
+
+## How the fork stays mergeable
+
+The rule: an edit to an upstream source file is a load-bearing patch on someone else's private API, so anything local-specific lives in new files upstream has never heard of. Three mechanisms make that possible:
+
+- **Serving session files under the LOCAL storage adapter.** The LOCAL adapter's `request()` returns a relative `/storage/...` URL that upstream has no route for (S3 returns a presigned URL, so hosted deployments never notice). Instead of patching the session viewer, the fork registers [`serveStorage.route.tsx`](app/modules/storage/containers/serveStorage.route.tsx) at `storage/*` — one added line in `app/routes.ts` — which authorizes against the project in the path and serves the file.
+- **Registering the Bedrock LLM provider.** Upstream registers providers with side-effect imports in `app/modules/llm/llm.ts`. Rather than edit that list, [`app/storageAdapters/llmProviders/index.ts`](app/storageAdapters/llmProviders/index.ts) piggybacks on `app/adapters.js`, which auto-imports every directory under `app/storageAdapters` into the generated `storage.ts` loaded by both the server and the workers at startup. It registers no storage adapter; it only imports the Bedrock provider.
+- **Keeping Claude Code worktrees out of the repo.** `.claude/hooks/create-worktree.sh` and `cleanup-worktree.sh` relocate agent worktrees to `~/.claude-worktrees/` once wired into `.claude/settings.json` as `WorktreeCreate`/`WorktreeRemove` hooks. Until then, `vitest.config.ts` and `eslint.config.js` carry a `**/.claude/**` exclude so full repo copies under `.claude/worktrees` don't run every test twice or trip typescript-eslint.
+
+What still touches upstream files, deliberately: the human-annotations feature (per-session and typed imports), two added routes in `app/routes.ts`, and the `@aws-sdk/client-bedrock-runtime` dependency in `package.json`/`yarn.lock`.
 
 ## Real GitHub OAuth
 
