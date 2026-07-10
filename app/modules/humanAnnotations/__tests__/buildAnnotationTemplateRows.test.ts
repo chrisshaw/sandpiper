@@ -94,40 +94,4 @@ describe("buildAnnotationTemplateRows", () => {
     const rows = buildAnnotationTemplateRows([], COLUMNS);
     expect(rows).toEqual([]);
   });
-
-  describe("PER_SESSION", () => {
-    const SESSION_COLUMNS = [
-      "session_id",
-      "content",
-      "annotator[joe][0]ON_TASK",
-    ];
-
-    it("emits one row per session with the joined transcript as content", () => {
-      const rows = buildAnnotationTemplateRows(
-        [
-          {
-            sessionName: "session_001.json",
-            transcript: [
-              { sequence_id: "1", role: "Tutor", content: "Hello!" },
-              { sequence_id: "2", role: "Student", content: "Hi!" },
-            ],
-          },
-          {
-            sessionName: "session_002.json",
-            transcript: [{ sequence_id: "1", role: "Tutor", content: "Yo" }],
-          },
-        ],
-        SESSION_COLUMNS,
-        "PER_SESSION",
-      );
-
-      expect(rows).toHaveLength(2);
-      expect(rows[0]).toEqual({
-        session_id: "session_001.json",
-        content: "Tutor: Hello!\nStudent: Hi!",
-        "annotator[joe][0]ON_TASK": "",
-      });
-      expect(rows[1].session_id).toBe("session_002.json");
-    });
-  });
 });

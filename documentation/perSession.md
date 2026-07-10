@@ -31,5 +31,4 @@ You select "Per session" when you set up a **Run**.
 - **[Per Utterance](perUtterance)** — Alternative fine-grained annotation
 - **[Prompts](prompts)** — Instructions that guide per-session analysis
 - **[Schema](schema)** — Defines the fields for session-level annotations
-- **[Human Annotations](humanAnnotations)** — Coding per-session labels by hand for comparison against LLM runs
 - **[Runs](runs)** — Where per-session annotation is applied

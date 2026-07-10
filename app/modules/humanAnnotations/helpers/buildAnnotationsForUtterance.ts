@@ -1,4 +1,4 @@
-import groupAnnotationColumns from "./groupAnnotationColumns";
+import parseAnnotationColumn from "./parseAnnotationColumns";
 
 interface AnnotationObject {
   _id: string;
@@ -11,11 +11,26 @@ export default function buildAnnotationsForUtterance(
   utteranceId: string,
   annotator: string,
   headers: string[],
-  fieldTypes: Record<string, string> = {},
 ): AnnotationObject[] {
-  const groups = groupAnnotationColumns(row, annotator, headers, fieldTypes);
+  // Group columns by index — each index produces one annotation object
+  const groups = new Map<number, Record<string, string>>();
+
+  for (const header of headers) {
+    const parsed = parseAnnotationColumn(header);
+    if (!parsed || parsed.annotator !== annotator) continue;
+
+    const value = row[header];
+    if (value === undefined || value === "") continue;
+
+    if (!groups.has(parsed.index)) {
+      groups.set(parsed.index, {});
+    }
+
+    groups.get(parsed.index)![parsed.field] = value;
+  }
 
   const annotations: AnnotationObject[] = [];
+
   const sortedIndices = [...groups.keys()].sort((a, b) => a - b);
 
   for (const index of sortedIndices) {

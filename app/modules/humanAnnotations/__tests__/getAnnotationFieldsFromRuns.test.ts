@@ -2,9 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Run } from "~/modules/runs/runs.types";
 import getAnnotationFieldsFromRuns from "../helpers/getAnnotationFieldsFromRuns";
 
-function mockRun(
-  fields: Array<{ fieldKey: string; isSystem?: boolean; fieldType?: string }>,
-): Run {
+function mockRun(fields: Array<{ fieldKey: string; isSystem?: boolean }>): Run {
   return {
     _id: "run1",
     name: "Test Run",
@@ -19,7 +17,6 @@ function mockRun(
           fieldKey: f.fieldKey,
           value: "",
           isSystem: f.isSystem ?? false,
-          ...(f.fieldType ? { fieldType: f.fieldType } : {}),
         })),
         annotationType: "PER_UTTERANCE",
         version: 1,
@@ -74,27 +71,6 @@ describe("getAnnotationFieldsFromRuns", () => {
     expect(result).toContainEqual({ fieldKey: "TUTOR_MOVE", runCount: 2 });
     expect(result).toContainEqual({ fieldKey: "ASKING_FEELING", runCount: 1 });
     expect(result).toContainEqual({ fieldKey: "CLARITY", runCount: 1 });
-  });
-
-  it("surfaces the field type when the source run declares one", () => {
-    const runs = [
-      mockRun([
-        { fieldKey: "ON_TASK", fieldType: "boolean" },
-        { fieldKey: "NOTES", fieldType: "string" },
-      ]),
-    ];
-
-    const result = getAnnotationFieldsFromRuns(runs);
-    expect(result).toContainEqual({
-      fieldKey: "ON_TASK",
-      runCount: 1,
-      fieldType: "boolean",
-    });
-    expect(result).toContainEqual({
-      fieldKey: "NOTES",
-      runCount: 1,
-      fieldType: "string",
-    });
   });
 
   it("handles runs with no annotation schema", () => {

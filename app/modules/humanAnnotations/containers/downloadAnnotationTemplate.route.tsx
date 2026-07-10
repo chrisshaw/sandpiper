@@ -7,8 +7,7 @@ import { ProjectService } from "~/modules/projects/project";
 import { RunSetService } from "~/modules/runSets/runSet";
 import { SessionService } from "~/modules/sessions/session";
 import getStorageAdapter from "~/modules/storage/helpers/getStorageAdapter";
-import buildAnnotationTemplateColumns from "../helpers/buildAnnotationTemplateColumns";
-import buildAnnotationTemplateRows from "../helpers/buildAnnotationTemplateRows";
+import buildAnnotationTemplate from "../helpers/buildAnnotationTemplate";
 import type { Route } from "./+types/downloadAnnotationTemplate.route";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
@@ -57,14 +56,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     });
   }
 
-  const annotationType = runSet.annotationType as
-    | "PER_UTTERANCE"
-    | "PER_SESSION";
-  const columns = buildAnnotationTemplateColumns(config, annotationType);
-  const rows = buildAnnotationTemplateRows(
+  const { columns, rows } = buildAnnotationTemplate(
+    config,
     sessionTranscripts,
-    columns,
-    annotationType,
+    runSet.annotationType,
   );
 
   const csv = json2csv(rows, {
