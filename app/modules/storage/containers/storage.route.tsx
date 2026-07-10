@@ -1,3 +1,4 @@
+import fse from "fs-extra";
 import type { ActionFunctionArgs } from "react-router";
 import requireAuth from "~/modules/authentication/helpers/requireAuth";
 import ProjectAuthorization from "~/modules/projects/authorization";
@@ -44,8 +45,9 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     const storage = getStorageAdapter();
-    const requestUrl = await storage.request({ url });
-    return { requestUrl };
+    const downloadedPath = await storage.download({ sourcePath: url });
+    const file = await fse.readJSON(downloadedPath);
+    return { file };
   }
 
   return {};

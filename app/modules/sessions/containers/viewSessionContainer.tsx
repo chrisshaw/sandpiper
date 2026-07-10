@@ -1,19 +1,21 @@
 import { useEffect, useState } from "react";
 import ViewSession from "../components/viewSession";
-import type { Session } from "../sessions.types";
+import type { Session, Utterance } from "../sessions.types";
 
 export default function ViewSessionContainer({
   session,
 }: {
   session: Session;
 }) {
-  const [transcript, setTranscript] = useState(null);
+  const [transcript, setTranscript] = useState<Utterance[] | null>(null);
   const [leadRole, setLeadRole] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchSession = async () => {
       const response = await fetch("/api/storage", {
         method: "POST",
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({
           intent: "REQUEST_STORAGE",
           payload: {
@@ -26,20 +28,15 @@ export default function ViewSessionContainer({
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const jsonData = await response.json();
+      const { file } = await response.json();
 
-      const sessionRequest = await fetch(jsonData.requestUrl);
-
-      if (!sessionRequest.ok) {
-        throw new Error(`HTTP error! status: ${sessionRequest.status}`);
-      }
-
-      const sessionData = await sessionRequest.json();
-
-      setTranscript(sessionData.transcript);
-      setLeadRole(sessionData.leadRole);
+      setTranscript(file.transcript);
+      setLeadRole(file.leadRole);
     };
-    fetchSession();
+
+    fetchSession().catch(() => {
+      setError("Unable to load this session's transcript.");
+    });
   }, []);
 
   return (
@@ -47,6 +44,7 @@ export default function ViewSessionContainer({
       transcript={transcript}
       session={session}
       leadRole={leadRole}
+      error={error}
     />
   );
 }

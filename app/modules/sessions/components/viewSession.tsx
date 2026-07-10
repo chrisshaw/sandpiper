@@ -16,10 +16,12 @@ export default function ViewSession({
   session,
   transcript,
   leadRole,
+  error,
 }: {
   session: Session;
   transcript: Utterance[] | null;
   leadRole: string;
+  error: string;
 }) {
   return (
     <DialogContent className="max-h-screen">
@@ -28,7 +30,10 @@ export default function ViewSession({
         <DialogDescription></DialogDescription>
       </DialogHeader>
       <div>
-        {!transcript && (
+        {error && (
+          <p className="text-destructive py-4 text-center text-sm">{error}</p>
+        )}
+        {!transcript && !error && (
           <div className="flex justify-center">
             <LoaderPinwheel className="animate-spin" />
           </div>
