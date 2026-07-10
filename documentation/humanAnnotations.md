@@ -73,7 +73,6 @@ Once human runs are added to a run set:
 
 ## Related Concepts
 
-- **[Typed & Per-Session Human Annotations](humanAnnotationsTyped)** — Boolean/number values and session-level templates
 - **[Run Sets](run-sets)** — Where human annotations are uploaded and compared
 - **[Runs](runs)** — Human runs appear alongside LLM runs
 - **[Evaluation Equations](evaluation-equations)** — The metrics used to compare runs
