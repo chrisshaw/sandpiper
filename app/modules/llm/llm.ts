@@ -5,7 +5,6 @@ import calculateLlmCost from "./helpers/calculateLlmCost";
 import getLLM from "./helpers/getLLM";
 import type { LLMUsage } from "./llm.types";
 import "./providers/aiGateway.js";
-import "./providers/bedrock.js";
 import "./providers/openAI.js";
 
 interface Message {
