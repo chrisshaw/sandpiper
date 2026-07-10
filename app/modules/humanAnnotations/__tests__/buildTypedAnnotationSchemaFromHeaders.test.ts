@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import buildAnnotationSchemaFromHeaders from "../helpers/buildAnnotationSchemaFromHeaders";
+import buildTypedAnnotationSchemaFromHeaders from "../helpers/buildTypedAnnotationSchemaFromHeaders";
 
-describe("buildAnnotationSchemaFromHeaders", () => {
-  it("returns typeless string-defaulted items when no types are known", () => {
+describe("buildTypedAnnotationSchemaFromHeaders", () => {
+  it("returns upstream's untyped string schema when no types are known", () => {
     const headers = ["session_id", "annotator[joe][0]TUTOR_MOVE"];
 
-    const result = buildAnnotationSchemaFromHeaders(headers);
+    const result = buildTypedAnnotationSchemaFromHeaders(headers, {});
 
     expect(result).toEqual([
       { fieldKey: "TUTOR_MOVE", value: "", isSystem: false },
@@ -19,7 +19,7 @@ describe("buildAnnotationSchemaFromHeaders", () => {
       "annotator[joe][0]ENGAGEMENT",
     ];
 
-    const result = buildAnnotationSchemaFromHeaders(headers, {
+    const result = buildTypedAnnotationSchemaFromHeaders(headers, {
       ON_TASK: "boolean",
       ENGAGEMENT: "number",
     });
@@ -41,7 +41,7 @@ describe("buildAnnotationSchemaFromHeaders", () => {
   it("deduplicates fields across multiple slots", () => {
     const headers = ["annotator[joe][0]ON_TASK", "annotator[joe][1]ON_TASK"];
 
-    const result = buildAnnotationSchemaFromHeaders(headers, {
+    const result = buildTypedAnnotationSchemaFromHeaders(headers, {
       ON_TASK: "boolean",
     });
 
