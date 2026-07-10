@@ -5,8 +5,8 @@ import ProjectAuthorization from "~/modules/projects/authorization";
 import { ProjectService } from "~/modules/projects/project";
 import { RunSetService } from "~/modules/runSets/runSet";
 import getStorageAdapter from "~/modules/storage/helpers/getStorageAdapter";
-import buildAnnotationSchemaFromHeaders from "../helpers/buildAnnotationSchemaFromHeaders";
 import analyzeHumanCsv from "../services/analyzeHumanCsv.server";
+import buildAnnotationSchemaForRunSet from "../services/buildAnnotationSchemaForRunSet.server";
 import createHumanRun from "../services/createHumanRun.server";
 import uploadHumanAnnotations from "../services/uploadHumanAnnotations.server";
 import type { Route } from "./+types/humanAnnotations.route";
@@ -90,7 +90,10 @@ export async function action({ request, params }: Route.ActionArgs) {
         uploadPath: csvPath,
       });
 
-      const annotationSchema = buildAnnotationSchemaFromHeaders(headers);
+      const annotationSchema = await buildAnnotationSchemaForRunSet(
+        runSet,
+        headers,
+      );
 
       const matchedSessionIds = analysis.matchedSessions.map((s) => s._id);
       const runIds: string[] = [];

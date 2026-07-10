@@ -3,6 +3,7 @@ import { parse } from "csv-parse/sync";
 import fse from "fs-extra";
 import filter from "lodash/filter";
 import find from "lodash/find.js";
+import applyHumanAnnotationExtensions from "../../app/modules/humanAnnotations/helpers/applyHumanAnnotationExtensions";
 import buildAnnotationsForUtterance from "../../app/modules/humanAnnotations/helpers/buildAnnotationsForUtterance";
 import { RunService } from "../../app/modules/runs/run";
 import getStorageAdapter from "../../app/modules/storage/helpers/getStorageAdapter";
@@ -80,6 +81,14 @@ export default async function processUploadHumanAnnotations(job: Job) {
         ...annotations,
       ];
     }
+
+    applyHumanAnnotationExtensions({
+      originalJSON,
+      sessionRows,
+      annotator,
+      headers,
+      run,
+    });
 
     const inputFileSplit = inputFile.split("/");
     const outputFileName = inputFileSplit[inputFileSplit.length - 1].replace(
